@@ -566,8 +566,16 @@
                     </div>
 
                     <div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-sm mb-4 sm:mb-5">
-                        <label class="block text-sm font-semibold text-pink-500 mb-2 flex items-center"><i class="fa-solid fa-box-open mr-2"></i>เลขพัสดุ (Tracking No.)</label>
-                        <input type="text" id="trackingNo" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100 transition-all bg-gray-50 focus:bg-white font-medium text-center tracking-widest text-base sm:text-lg" placeholder="เว้นว่างได้หากยังไม่จัดส่ง">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-pink-500 mb-2 flex items-center"><i class="fa-solid fa-box-open mr-2"></i>เลขพัสดุ (Tracking No.)</label>
+                                <input type="text" id="trackingNo" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100 transition-all bg-gray-50 focus:bg-white font-medium text-center tracking-widest text-base sm:text-lg" placeholder="เว้นว่างได้หากยังไม่จัดส่ง">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-pink-500 mb-2 flex items-center"><i class="fa-solid fa-truck-fast mr-2"></i>ค่าจัดส่ง (บาท)</label>
+                                <input type="number" id="shippingFee" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100 transition-all bg-gray-50 focus:bg-white font-medium text-center text-base sm:text-lg" placeholder="50" min="0">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-sm mb-2">
@@ -1167,6 +1175,7 @@
             document.getElementById('paymentStatus').value = 'paid';
             togglePaymentAmount();
             document.querySelector('input[name="timelineStatus"][value="1"]').checked = true;
+            document.getElementById('shippingFee').value = '50';
 
             orderModal.classList.remove('hidden-section');
         }
@@ -1315,6 +1324,7 @@
                 if(radioBtn) radioBtn.checked = true;
                 
                 document.getElementById('trackingNo').value = order.tracking_no || '';
+                document.getElementById('shippingFee').value = order.shipping_fee !== undefined && order.shipping_fee !== null ? order.shipping_fee : 50;
                 document.getElementById('productList').innerHTML = '';
                 productRowCount = 0;
                 
@@ -1365,6 +1375,8 @@
             let dateVal = document.getElementById('orderDate').value;
             dateVal = dateVal ? new Date(dateVal).toISOString() : new Date().toISOString();
 
+            const shippingFeeVal = parseFloat(document.getElementById('shippingFee').value) || 0;
+
             await withLoader(async () => {
                 const orderData = {
                     id: newOrderId,
@@ -1374,7 +1386,7 @@
                     payment_status: paymentStatusVal,
                     payment_amount: paymentAmountVal,
                     tracking_no: document.getElementById('trackingNo').value.trim(),
-                    shipping_fee: 50 
+                    shipping_fee: shippingFeeVal 
                 };
 
                 // Upsert Order Main Data
